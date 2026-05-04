@@ -67,10 +67,12 @@ async def build_carousel(request: CarouselRequest):
     USAGE_ANALYTICS["carousel_builder"] += 1
     images = search_unsplash_images(request.keyword, count=request.slides_count)
     image_urls = [img["url"] for img in images]
+    credits = [img["credit"] for img in images]
     
     response = CarouselResponse(
         carousel_images=image_urls,
-        overlay_text=f"The Story of {request.keyword}"
+        overlay_text=f"The Story of {request.keyword}",
+        credits=credits
     )
     
     log_structured("build_carousel", {"keyword": request.keyword, "count": len(image_urls)})
@@ -100,6 +102,7 @@ async def create_moodboard(request: MoodboardRequest):
     USAGE_ANALYTICS["moodboard"] += 1
     images = search_unsplash_images(request.keyword, count=4)
     image_urls = [img["url"] for img in images]
+    credits = [img["credit"] for img in images]
     
     if len(image_urls) < 4:
         return Response(status_code=404, content="Not enough images found for a moodboard")
@@ -108,7 +111,8 @@ async def create_moodboard(request: MoodboardRequest):
     # Here we simulate by returning the list of images.
     response = MoodboardResponse(
         moodboard_grid="Grid metadata generated",
-        image_urls=image_urls
+        image_urls=image_urls,
+        credits=credits
     )
     
     log_structured("create_moodboard", {"keyword": request.keyword})

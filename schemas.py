@@ -22,6 +22,7 @@ class CarouselRequest(BaseModel):
 class CarouselResponse(BaseModel):
     carousel_images: List[str]
     overlay_text: str
+    credits: List[ImageCredit]
 
 class BlogRequest(BaseModel):
     article_text: str
@@ -34,8 +35,9 @@ class MoodboardRequest(BaseModel):
     keyword: str
 
 class MoodboardResponse(BaseModel):
-    moodboard_grid: str  # URL to a generated grid image or a layout description
+    moodboard_grid: str
     image_urls: List[str]
+    credits: List[ImageCredit]
 
 class QuoteRequest(BaseModel):
     quote_text: str

@@ -36,7 +36,17 @@ Overlay elegant typography on atmospheric imagery to create high-engagement quot
 - **OAuth Callback**: Whitelisted support for `urn:ietf:wg:oauth:2.0:oob` and production URLs.
 - **Permissions**: Operates strictly on `public_access_only` scopes.
 - **Data Protection**: API keys are stored server-side via environment variables and are never exposed to the client.
-- **Unsplash Compliance**: Automates download tracking and attribution with UTM parameters.
+
+---
+
+## ⚖️ Unsplash API Terms Compliance
+AxpostMedia is built to strictly adhere to the [Unsplash API Terms of Use](https://unsplash.com/developers):
+- **Authentic Experience**: Designed for creative, human-centric visual content generation.
+- **Hotlinking**: Directly uses and embeds image URLs as required by Section 6 of the terms.
+- **Download Tracking**: Every image retrieval automatically notifies the Unsplash `download_location` endpoint.
+- **Strict Attribution**: Every visual displayed attributes Unsplash and the photographer, with direct links to their Unsplash profiles.
+- **No Replication**: AxpostMedia is a creation tool, not a wallpaper app or Unsplash clone.
+- **Privacy Policy**: Users must provide their own privacy policy when deploying this as a Developer App.
 
 ---
 
