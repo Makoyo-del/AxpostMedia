@@ -5,3 +5,4 @@ pillow
 pydantic
 python-dotenv
 slowapi
+groq

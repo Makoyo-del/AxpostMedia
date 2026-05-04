@@ -7,28 +7,25 @@ client = TestClient(app)
 
 @pytest.fixture
 def mock_unsplash():
-    with patch("utils.requests.get") as mock_get:
-        # Mocking a successful Unsplash response
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
-            "urls": {"regular": "https://example.com/image.jpg"},
-            "user": {
-                "name": "John Doe",
-                "username": "johndoe",
-                "links": {"html": "https://unsplash.com/@johndoe"}
-            },
-            "links": {"download_location": "https://api.unsplash.com/photos/123/download"},
-            "results": [
-                {
-                    "urls": {"regular": "https://example.com/img1.jpg"},
-                    "user": {"name": "User 1", "username": "u1", "links": {"html": "..."}},
-                    "links": {"download_location": "..."}
-                }
-            ] * 5
+    # Patch the functions in the 'main' module where they are imported
+    with patch("main.get_unsplash_image") as mock_img, \
+         patch("main.search_unsplash_images") as mock_search, \
+         patch("main.generate_ai_caption") as mock_caption, \
+         patch("main.extract_smart_keywords") as mock_keywords, \
+         patch("main.generate_carousel_story") as mock_story:
+        
+        mock_img.return_value = {
+            "url": "https://example.com/image.jpg",
+            "credit": {"name": "Test User", "username": "test", "link": "https://unsplash.com/@test"}
         }
-        mock_get.return_value = mock_response
-        yield mock_get
+        mock_search.return_value = [
+            {"url": "https://example.com/1.jpg", "credit": {"name": "User 1", "username": "u1", "link": "https://u1.com"}},
+            {"url": "https://example.com/2.jpg", "credit": {"name": "User 2", "username": "u2", "link": "https://u2.com"}}
+        ]
+        mock_caption.return_value = "AI Generated Caption"
+        mock_keywords.return_value = ["tech", "future", "clean"]
+        mock_story.return_value = ["start", "middle", "end"]
+        yield
 
 def test_root():
     response = client.get("/")
@@ -46,20 +43,16 @@ def test_social_media_post(mock_unsplash):
     data = response.json()
     assert "image_url" in data
     assert "caption" in data
-    assert data["credit"]["name"] == "John Doe"
+    assert data["credit"]["name"] == "Test User"
 
 def test_rate_limit():
-    # Since we set capacity=50 and fill_rate=50/3600, 
-    # we can try to consume all tokens to test the limit.
-    # But for a unit test, we might want to mock the rate limiter instead.
     with patch("rate_limiter.rate_limiter.consume", return_value=False):
         response = client.get("/")
         assert response.status_code == 429
         assert "Rate limit exceeded" in response.json()["detail"]
 
 def test_security_api_key_leak(mock_unsplash):
-    # Ensure the access key is not in any response
     response = client.post("/social-media-post", json={"keyword": "nature", "platform": "instagram"})
     assert "Client-ID" not in response.text
-    # Check that it's not in the credit links either (it shouldn't be)
-    assert "your_access_key_here" not in response.text
+    # Ensure no real keys leak in text
+    assert "s8OgR_FRSMgGxxXnn9ba0J5iSPndfTj58zjvypdS8JI" not in response.text

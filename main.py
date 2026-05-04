@@ -2,6 +2,7 @@ from fastapi import FastAPI, Response
 from schemas import *
 from utils import get_unsplash_image, search_unsplash_images, create_image_grid, extract_keywords, log_structured
 from rate_limiter import RateLimitMiddleware
+from brain import generate_ai_caption, extract_smart_keywords, generate_carousel_story
 import uvicorn
 
 app = FastAPI(title="AxpostMedia API")
@@ -47,15 +48,17 @@ async def get_stats():
 @app.post("/social-media-post", response_model=SocialMediaResponse)
 async def generate_social_post(request: SocialMediaRequest):
     USAGE_ANALYTICS["social_media_post"] += 1
-    orientation = "squarish" if request.platform.lower() in ["instagram", "facebook"] else "landscape"
-    image_data = get_unsplash_image(request.keyword, orientation=orientation)
+    image_data = get_unsplash_image(request.keyword)
     
     if not image_data:
         return Response(status_code=404, content="Image not found")
     
+    # AI-powered caption
+    ai_caption = generate_ai_caption(request.keyword, request.platform)
+    
     response = SocialMediaResponse(
         image_url=image_data["url"],
-        caption=f"Check out this amazing visual for {request.keyword}! #VisualFlow #{request.platform}",
+        caption=ai_caption,
         credit=image_data["credit"]
     )
     
@@ -65,13 +68,22 @@ async def generate_social_post(request: SocialMediaRequest):
 @app.post("/carousel-builder", response_model=CarouselResponse)
 async def build_carousel(request: CarouselRequest):
     USAGE_ANALYTICS["carousel_builder"] += 1
-    images = search_unsplash_images(request.keyword, count=request.slides_count)
+    
+    # AI-driven narrative sequence
+    queries = generate_carousel_story(request.keyword, request.slides_count)
+    
+    images = []
+    for query in queries:
+        img = get_unsplash_image(query)
+        if img:
+            images.append(img)
+            
     image_urls = [img["url"] for img in images]
     credits = [img["credit"] for img in images]
     
     response = CarouselResponse(
         carousel_images=image_urls,
-        overlay_text=f"The Story of {request.keyword}",
+        overlay_text=f"The Journey of {request.keyword}",
         credits=credits
     )
     
@@ -79,19 +91,24 @@ async def build_carousel(request: CarouselRequest):
     return response
 
 @app.post("/blog-image-inserter", response_model=BlogResponse)
-async def insert_blog_images(request: BlogRequest):
+async def suggest_blog_images(request: BlogRequest):
     USAGE_ANALYTICS["blog_image_inserter"] += 1
-    keywords = extract_keywords(request.article_text)
-    query = " ".join(keywords) if keywords else "blog"
     
-    image_data = get_unsplash_image(query, orientation="landscape")
+    # AI-powered smart keyword extraction
+    keywords = extract_smart_keywords(request.article_text)
     
-    if not image_data:
-        return Response(status_code=404, content="No images suggested")
+    all_images = []
+    for kw in keywords[:2]: # Get images for top 2 AI keywords
+        img = get_unsplash_image(kw)
+        if img:
+            all_images.append(img)
+            
+    if not all_images:
+        return Response(status_code=404, content="No relevant images found")
     
     response = BlogResponse(
-        suggested_images=[image_data["url"]],
-        credit=image_data["credit"]
+        suggested_images=[img["url"] for img in all_images],
+        credit=all_images[0]["credit"]
     )
     
     log_structured("blog_image_inserter", {"keywords": keywords})
