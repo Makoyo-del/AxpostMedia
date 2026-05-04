@@ -8,12 +8,31 @@ const closeResults = () => {
     document.body.style.overflow = 'auto';
 };
 
-const renderAttribution = (credit) => `
+const renderAttribution = (credit, downloadUrl) => `
     <div class="attribution">
         Photo by <a href="${credit.link}?utm_source=axpostmedia&utm_medium=referral" target="_blank">${credit.name}</a> 
         on <a href="https://unsplash.com?utm_source=axpostmedia&utm_medium=referral" target="_blank">Unsplash</a>
+        <br>
+        <a href="${downloadUrl}" target="_blank" class="btn-download">Download High-Res</a>
     </div>
 `;
+
+async function fetchStats() {
+    try {
+        const response = await fetch('/stats');
+        const data = await response.json();
+        document.getElementById('stat-social').innerText = data.social_media_post || 0;
+        document.getElementById('stat-carousel').innerText = data.carousel_builder || 0;
+        document.getElementById('stat-blog').innerText = data.blog_image_inserter || 0;
+        document.getElementById('stat-mood').innerText = data.moodboard || 0;
+    } catch (e) {
+        console.error('Stats fetch failed');
+    }
+}
+
+// Polling for stats
+setInterval(fetchStats, 5000);
+fetchStats();
 
 async function generateSocialPost() {
     const keyword = document.getElementById('social-kw').value;
@@ -33,14 +52,15 @@ async function generateSocialPost() {
         
         const output = document.getElementById('output-content');
         output.innerHTML = `
-            <img src="${data.image_url}" class="result-img">
+            <img src="${data.image_url}&w=1200" class="result-img">
             <div class="caption-box">
                 <p><strong>${platform} Caption:</strong></p>
                 <p>${data.caption}</p>
             </div>
-            ${renderAttribution(data.credit)}
+            ${renderAttribution(data.credit, data.image_url)}
         `;
         showResults();
+        fetchStats();
     } catch (e) {
         alert('Error generating post');
     } finally {
@@ -66,19 +86,21 @@ async function generateCarousel() {
         
         const output = document.getElementById('output-content');
         let slidesHtml = data.carousel_images.map((url, i) => `
-            <div style="text-align:center">
-                <img src="${url}" class="result-img">
-                ${renderAttribution(data.credits[i])}
+            <div class="carousel-slide">
+                <img src="${url}&w=1000" class="result-img">
+                ${renderAttribution(data.credits[i], url)}
             </div>
-        `).join('<br>');
+        `).join('');
 
         output.innerHTML = `
             <h2>${data.overlay_text}</h2>
-            <div class="carousel-view">
+            <div class="carousel-container">
                 ${slidesHtml}
             </div>
+            <p style="color:rgba(255,255,255,0.4); font-size:0.8rem">Scroll horizontally to view slides →</p>
         `;
         showResults();
+        fetchStats();
     } catch (e) {
         alert('Error building carousel');
     } finally {
@@ -103,17 +125,22 @@ async function generateBlogImages() {
         
         const output = document.getElementById('output-content');
         let imgsHtml = data.suggested_images.map(url => `
-            <img src="${url}" class="result-img">
+            <div style="text-align:center">
+                <img src="${url}&w=800" class="result-img" style="max-height:40vh">
+                <br>
+                <a href="${url}" target="_blank" class="btn-download">Download</a>
+            </div>
         `).join('');
 
         output.innerHTML = `
             <h3>Suggested Visuals</h3>
-            <div style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center">
+            <div style="display:flex; gap:1.5rem; flex-wrap:wrap; justify-content:center">
                 ${imgsHtml}
             </div>
-            ${renderAttribution(data.credit)}
+            <p class="attribution">Photos from Unsplash (Attribution required)</p>
         `;
         showResults();
+        fetchStats();
     } catch (e) {
         alert('Error suggesting images');
     } finally {
@@ -138,16 +165,18 @@ async function generateMoodboard() {
         
         const output = document.getElementById('output-content');
         let gridHtml = data.image_urls.map(url => `
-            <img src="${url}" style="width:250px; height:250px; object-fit:cover; border-radius:10px">
+            <img src="${url}&w=600" style="width:100%; height:300px; object-fit:cover; border-radius:10px">
         `).join('');
 
         output.innerHTML = `
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; width:100%; max-width:800px">
                 ${gridHtml}
             </div>
             <p class="attribution">Credits: ${data.credits.map(c => c.name).join(', ')}</p>
+            <a href="#" onclick="alert('Exporting high-res grid...') " class="btn-download">Export Grid</a>
         `;
         showResults();
+        fetchStats();
     } catch (e) {
         alert('Error creating moodboard');
     } finally {
