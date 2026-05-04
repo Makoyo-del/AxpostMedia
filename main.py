@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Request, Response
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 from schemas import *
 from utils import get_unsplash_image, search_unsplash_images, create_image_grid, extract_keywords, log_structured
 from rate_limiter import RateLimitMiddleware
@@ -19,9 +21,13 @@ USAGE_ANALYTICS = {
 # Register global rate limiting middleware
 app.add_middleware(RateLimitMiddleware)
 
-@app.get("/")
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    return {"message": "Welcome to AxpostMedia API"}
+    with open("static/index.html", "r") as f:
+        return f.read()
 
 @app.get("/callback")
 async def oauth_callback(code: str = None):

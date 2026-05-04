@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AxpostMedia | Premium Visual Content Studio</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="logo">Axpost<span>Media</span></div>
+        <div class="nav-links">
+            <a href="#dashboard" class="active">Dashboard</a>
+            <a href="#stats">Analytics</a>
+            <a href="https://unsplash.com" target="_blank">Unsplash</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <header class="hero">
+            <h1>Elevate Your <span>Visual</span> Storytelling</h1>
+            <p>AI-powered generators for premium social posts, carousels, and moodboards.</p>
+        </header>
+
+        <section class="grid" id="dashboard">
+            <!-- Social Media Post -->
+            <div class="glass-card" id="card-social">
+                <div class="card-icon">📱</div>
+                <h3>Social Post Gen</h3>
+                <p>Perfectly sized visuals with AI-crafted captions.</p>
+                <div class="input-group">
+                    <input type="text" id="social-kw" placeholder="Keyword (e.g. Minimalist)">
+                    <select id="social-platform">
+                        <option value="Instagram">Instagram</option>
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="Twitter">Twitter/X</option>
+                    </select>
+                </div>
+                <button onclick="generateSocialPost()">Generate Post</button>
+            </div>
+
+            <!-- Carousel Builder -->
+            <div class="glass-card" id="card-carousel">
+                <div class="card-icon">🎠</div>
+                <h3>Carousel Builder</h3>
+                <p>AI-sequenced narrative carousels for storytelling.</p>
+                <div class="input-group">
+                    <input type="text" id="carousel-kw" placeholder="Topic (e.g. Sustainability)">
+                    <input type="number" id="carousel-count" value="5" min="3" max="10">
+                </div>
+                <button onclick="generateCarousel()">Build Carousel</button>
+            </div>
+
+            <!-- Blog Inserter -->
+            <div class="glass-card" id="card-blog">
+                <div class="card-icon">✍️</div>
+                <h3>Blog Inserter</h3>
+                <p>AI extracts intent from your text to suggest images.</p>
+                <textarea id="blog-text" placeholder="Paste your article snippet here..."></textarea>
+                <button onclick="generateBlogImages()">Suggest Images</button>
+            </div>
+
+            <!-- Moodboard -->
+            <div class="glass-card" id="card-mood">
+                <div class="card-icon">🖼️</div>
+                <h3>Moodboard Tool</h3>
+                <p>Curated inspiration grids in a single click.</p>
+                <div class="input-group">
+                    <input type="text" id="mood-kw" placeholder="Vibe (e.g. Cyberpunk)">
+                </div>
+                <button onclick="generateMoodboard()">Curate Grid</button>
+            </div>
+        </section>
+
+        <section id="results" class="results-area hidden">
+            <div class="results-header">
+                <h2>Your Masterpiece</h2>
+                <button onclick="closeResults()" class="btn-close">Close</button>
+            </div>
+            <div id="output-content" class="output-container">
+                <!-- Dynamic content injected here -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 AxpostMedia. Powered by Unsplash & Groq AI.</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
