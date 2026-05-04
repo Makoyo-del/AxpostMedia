@@ -64,3 +64,31 @@ def generate_carousel_story(keyword, count):
     except Exception as e:
         print(f"Groq Error: {e}")
         return [keyword] * count
+
+def generate_moodboard_keywords(vibe):
+    """Generates 4 distinct but related keywords for a cohesive moodboard."""
+    prompt = f"Given the vibe '{vibe}', provide 4 distinct visual keywords that would make a cohesive moodboard. Return ONLY the keywords separated by commas."
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model="llama-3.1-8b-instant",
+            temperature=0.6,
+            max_tokens=50
+        )
+        return [k.strip() for k in chat_completion.choices[0].message.content.split(",")]
+    except:
+        return [vibe] * 4
+
+def suggest_quote_background(quote_text):
+    """Suggests a visual search keyword for a given quote."""
+    prompt = f"Suggest ONE visual search keyword for a background image that fits this quote: '{quote_text}'. Return ONLY the keyword."
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model="llama-3.1-8b-instant",
+            temperature=0.4,
+            max_tokens=20
+        )
+        return chat_completion.choices[0].message.content.strip()
+    except:
+        return "inspiration"

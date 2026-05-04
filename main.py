@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse
 from schemas import *
 from utils import get_unsplash_image, search_unsplash_images, create_image_grid, extract_keywords, log_structured
 from rate_limiter import RateLimitMiddleware
-from brain import generate_ai_caption, extract_smart_keywords, generate_carousel_story
+from brain import generate_ai_caption, extract_smart_keywords, generate_carousel_story, generate_moodboard_keywords, suggest_quote_background
 import uvicorn
 
 app = FastAPI(title="AxpostMedia API")
@@ -130,7 +130,16 @@ async def suggest_blog_images(request: BlogRequest):
 @app.post("/moodboard", response_model=MoodboardResponse)
 async def create_moodboard(request: MoodboardRequest):
     USAGE_ANALYTICS["moodboard"] += 1
-    images = search_unsplash_images(request.keyword, count=4)
+    
+    # AI-powered cohesive keyword expansion
+    keywords = generate_moodboard_keywords(request.keyword)
+    
+    images = []
+    for kw in keywords[:4]:
+        img = get_unsplash_image(kw)
+        if img:
+            images.append(img)
+            
     image_urls = [img["url"] for img in images]
     credits = [img["credit"] for img in images]
     
@@ -151,7 +160,10 @@ async def create_moodboard(request: MoodboardRequest):
 @app.post("/quote-generator", response_model=QuoteResponse)
 async def generate_quote_image(request: QuoteRequest):
     USAGE_ANALYTICS["quote_generator"] += 1
-    image_data = get_unsplash_image(request.keyword, orientation="squarish")
+    
+    # AI-suggested background keyword
+    bg_keyword = suggest_quote_background(request.quote_text)
+    image_data = get_unsplash_image(bg_keyword, orientation="squarish")
     
     if not image_data:
         return Response(status_code=404, content="Image not found")

@@ -25,8 +25,46 @@ async function fetchStats() {
         document.getElementById('stat-carousel').innerText = data.carousel_builder || 0;
         document.getElementById('stat-blog').innerText = data.blog_image_inserter || 0;
         document.getElementById('stat-mood').innerText = data.moodboard || 0;
+        const total = (data.social_media_post || 0) + (data.carousel_builder || 0) + (data.blog_image_inserter || 0) + (data.moodboard || 0) + (data.quote_generator || 0);
+        document.getElementById('stats').querySelector('p').innerText = `Real-time usage tracking: ${total} assets generated today.`;
     } catch (e) {
         console.error('Stats fetch failed');
+    }
+}
+
+// ... existing functions ...
+
+async function generateQuote() {
+    const quote_text = document.getElementById('quote-text').value;
+    if (!quote_text) return alert('Please enter a quote');
+
+    const btn = document.querySelector('#card-quote button');
+    btn.innerText = 'Styling...';
+
+    try {
+        const response = await fetch('/quote-generator', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quote_text })
+        });
+        const data = await response.json();
+        
+        const output = document.getElementById('output-content');
+        output.innerHTML = `
+            <div style="position:relative; display:inline-block">
+                <img src="${data.image_with_overlay}&w=1000" class="result-img">
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:80%; text-align:center; color:white; font-family:'Space Grotesk'; font-size:1.5rem; text-shadow: 2px 2px 10px rgba(0,0,0,0.8);">
+                    "${quote_text}"
+                </div>
+            </div>
+            ${renderAttribution(data.credit, data.image_with_overlay)}
+        `;
+        showResults();
+        fetchStats();
+    } catch (e) {
+        alert('Error generating quote image');
+    } finally {
+        btn.innerText = 'Style Quote';
     }
 }
 
