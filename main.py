@@ -79,10 +79,17 @@ async def build_carousel(request: CarouselRequest):
     queries = generate_carousel_story(request.keyword, request.slides_count)
     
     images = []
+    used_ids = set()
+    
     for query in queries:
-        img = get_unsplash_image(query)
-        if img:
-            images.append(img)
+        # Try up to 3 times to get a unique image for this query
+        for _ in range(3):
+            img_data = get_unsplash_image(query)
+            # We need the ID to check for duplicates. get_unsplash_image doesn't return it currently.
+            # I'll update get_unsplash_image to return the ID.
+            if img_data and img_data["url"] not in [i["url"] for i in images]:
+                images.append(img_data)
+                break
             
     image_urls = [img["url"] for img in images]
     credits = [img["credit"] for img in images]

@@ -30,8 +30,8 @@ async function fetchStats() {
     }
 }
 
-// Polling for stats
-setInterval(fetchStats, 5000);
+// Polling for stats every 30 seconds
+setInterval(fetchStats, 30000);
 fetchStats();
 
 async function generateSocialPost() {

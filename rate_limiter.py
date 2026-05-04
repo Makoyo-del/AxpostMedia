@@ -31,6 +31,11 @@ rate_limiter = TokenBucket(capacity=50, fill_rate=50/3600)
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        # Whitelist stats and static assets from rate limiting
+        path = request.url.path
+        if path == "/stats" or path.startswith("/static"):
+            return await call_next(request)
+            
         if not rate_limiter.consume():
             return JSONResponse(
                 status_code=429,
