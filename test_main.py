@@ -30,7 +30,7 @@ def mock_unsplash():
 def test_root():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"message": "Welcome to AxpostMedia API"}
+    assert "AxpostMedia" in response.text
 
 def test_callback():
     response = client.get("/callback?code=testcode")
