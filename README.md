@@ -1,6 +1,6 @@
-# VisualFlow Studio 🎨✨
+# AxpostMedia 🎨✨
 
-**VisualFlow Studio** is a premium visual content generation platform designed for freelancers and SMEs. Powered by the Unsplash API and FastAPI, it automates the creation of stunning social media posts, visual carousels, blog imagery, and moodboards with high-end glassmorphic aesthetics.
+**AxpostMedia** is a premium visual content generation platform designed for freelancers and SMEs. Powered by the Unsplash API and FastAPI, it automates the creation of stunning social media posts, visual carousels, blog imagery, and moodboards with high-end glassmorphic aesthetics.
 
 ---
 
@@ -73,4 +73,4 @@ const generatePost = async (keyword, platform) => {
 ```
 
 ---
-© 2026 VisualFlow Studio. Built with passion for creators.
+© 2026 AxpostMedia. Built with passion for creators.

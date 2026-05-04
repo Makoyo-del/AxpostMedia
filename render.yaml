@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: visualflow-studio
+    name: axpost-media
     env: python
     plan: free # Demo tier
     buildCommand: pip install -r requirements.txt

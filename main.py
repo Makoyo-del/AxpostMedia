@@ -4,7 +4,7 @@ from utils import get_unsplash_image, search_unsplash_images, create_image_grid,
 from rate_limiter import RateLimitMiddleware
 import uvicorn
 
-app = FastAPI(title="VisualFlow Studio API")
+app = FastAPI(title="AxpostMedia API")
 
 # Usage Analytics
 USAGE_ANALYTICS = {
@@ -20,7 +20,7 @@ app.add_middleware(RateLimitMiddleware)
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to VisualFlow Studio API"}
+    return {"message": "Welcome to AxpostMedia API"}
 
 @app.get("/callback")
 async def oauth_callback(code: str = None):
