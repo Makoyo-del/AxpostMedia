@@ -11,6 +11,6 @@ services:
       - key: UNSPLASH_SECRET_KEY
         sync: false
       - key: UNSPLASH_REDIRECT_URI
-        default: urn:ietf:wg:oauth:2.0:oob
+        value: urn:ietf:wg:oauth:2.0:oob
       - key: GROQ_API_KEY
         sync: false
